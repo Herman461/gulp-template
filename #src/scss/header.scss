@@ -1,0 +1,7 @@
+.header {
+  background-color: red;
+
+  @media (max-width: $md3) {
+    background-color: yellow;
+  }
+}

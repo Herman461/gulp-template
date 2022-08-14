@@ -1,0 +1,19 @@
+
+$md3: 767.98px;
+
+@import "header";
+div {
+  display: flex;
+
+  > div {
+    span {
+      display: grid;
+    }
+  }
+}
+
+.class {
+  @media (max-width: $md3) {
+    display: block !important;
+  }
+}
