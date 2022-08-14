@@ -3,17 +3,17 @@ $md3: 767.98px;
 
 @import "header";
 div {
-  display: flex;
+    display: flex;
 
-  > div {
-    span {
-      display: grid;
+    > div {
+        span {
+            display: grid;
+        }
     }
-  }
 }
 
 .class {
-  @media (max-width: $md3) {
-    display: block !important;
-  }
+    @media (max-width: $md3) {
+        display: block !important;
+    }
 }
