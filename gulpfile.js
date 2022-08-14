@@ -14,6 +14,11 @@ import formatHtml from 'gulp-format-html';
 import rename from 'gulp-rename';
 import uglify from 'gulp-uglify';
 import jsmin from 'gulp-jsmin';
+import imagemin from "gulp-imagemin";
+import mozjpeg from 'imagemin-mozjpeg';
+import pngquant from 'imagemin-pngquant';
+import webp from 'gulp-webp';
+import webpcss from 'gulp-webpcss';
 
 const sass = gulpSass(dartSass);
 
@@ -23,18 +28,21 @@ const paths = {
         mainHTML: ['#src/*.html', '!#src/_*.html'],
         scss: '#src/scss/style.scss',
         js: '#src/js/script.js',
-        libjs: '#src/js/libs/*.js'
+        libjs: '#src/js/libs/*.js',
+        images: ['#src/images/*.{jpg,jpeg,png,gif}', '#src/images/**/*.{jpg,jpeg,png,gif}']
     },
     build: {
         html: 'dist/',
         css: 'dist/css/',
         js: 'dist/js/',
+        images: 'dist/images/'
     },
     deletedFiles: {
         html: 'dist/*.html',
         css: 'dist/css/*.css',
         js: 'dist/js/*.js',
-        libjs: ['dist/*.js', '!dist/js/script.js']
+        libjs: ['dist/*.js', '!dist/js/script.js'],
+        images: 'dist/images/**/*.{jpg,jpeg,png,gif}'
     }
 }
 
@@ -74,6 +82,7 @@ async function css(cb) {
         }))
         .pipe(sass())
         .pipe(groupMediaQueries())
+        .pipe(webpcss({webpClass: '', noWebpClass: '.no-webp'}))
         .pipe(gulp.dest(paths.build.css))
         .pipe(browserSync.stream())
 }
@@ -112,6 +121,24 @@ async function libjs() {
         .pipe(gulp.dest(paths.build.js))
 }
 
+async function images() {
+    await del(paths.deletedFiles.images)
+    return gulp.src(paths.src.images)
+        .pipe(plumber(
+            notify.onError({
+                title: 'IMAGES',
+                message: 'Error <%= error.message %>'
+            })
+        ))
+        .pipe(imagemin([
+            pngquant({quality: [0.5, 0.5]}),
+            mozjpeg({quality: 50})
+        ]))
+        .pipe(gulp.dest(paths.build.images))
+        .pipe(webp({quality: 70}))
+        .pipe(gulp.dest(paths.build.images))
+}
+
 
 function server() {
     browserSync.init({
@@ -128,7 +155,8 @@ function watcher() {
     gulp.watch(paths.src.scss, css)
     gulp.watch(paths.src.js, js)
     gulp.watch(paths.src.libjs, libjs)
+    gulp.watch(paths.src.libjs, images)
 }
 
-const dev = gulp.series(html, css, js, libjs, gulp.parallel(server, watcher))
+const dev = gulp.series(html, css, js, libjs, images, gulp.parallel(server, watcher))
 export default dev

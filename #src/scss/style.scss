@@ -13,7 +13,9 @@ div {
 }
 
 .class {
+    background: url("../images/Earth_Black_background_548690_4000x4000.jpg");
     @media (max-width: $md3) {
         display: block !important;
+
     }
 }

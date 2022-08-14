@@ -22,6 +22,7 @@
     "gulp-format-html": "^1.2.5",
     "gulp-group-css-media-queries": "^1.2.2",
     "gulp-htmlhint": "^4.0.2",
+    "gulp-imagemin": "^8.0.0",
     "gulp-jsmin": "^0.1.5",
     "gulp-notify": "^4.0.0",
     "gulp-plumber": "^1.2.1",
@@ -29,6 +30,11 @@
     "gulp-sass": "^5.1.0",
     "gulp-strip-comments": "^2.5.2",
     "gulp-uglify": "^3.0.2",
-    "sass": "^1.54.4"
+    "gulp-webp": "^4.0.1",
+    "gulp-webpcss": "^1.1.1",
+    "imagemin-mozjpeg": "^10.0.0",
+    "imagemin-pngquant": "^9.0.2",
+    "sass": "^1.54.4",
+    "webp-converter": "^2.2.3"
   }
 }
