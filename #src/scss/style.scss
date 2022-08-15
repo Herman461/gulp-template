@@ -2,9 +2,10 @@
 $md3: 767.98px;
 
 @import "header";
+@import "mixins";
+@import "fonts";
 div {
     display: flex;
-
     > div {
         span {
             display: grid;

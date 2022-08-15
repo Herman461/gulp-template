@@ -12,13 +12,17 @@ import babel from 'gulp-babel';
 import strip from 'gulp-strip-comments';
 import formatHtml from 'gulp-format-html';
 import rename from 'gulp-rename';
-import uglify from 'gulp-uglify';
 import jsmin from 'gulp-jsmin';
 import imagemin from "gulp-imagemin";
 import mozjpeg from 'imagemin-mozjpeg';
 import pngquant from 'imagemin-pngquant';
 import webp from 'gulp-webp';
 import webpcss from 'gulp-webpcss';
+import ttf2woff2 from 'gulp-ttftowoff2';
+import ttf2woff from 'gulp-ttf2woff';
+import cheerio from 'gulp-cheerio';
+import sprite from 'gulp-svg-sprite';
+import * as fs from "fs";
 
 const sass = gulpSass(dartSass);
 
@@ -29,20 +33,26 @@ const paths = {
         scss: '#src/scss/style.scss',
         js: '#src/js/script.js',
         libjs: '#src/js/libs/*.js',
-        images: ['#src/images/*.{jpg,jpeg,png,gif}', '#src/images/**/*.{jpg,jpeg,png,gif}']
+        images: ['#src/images/*.{jpg,jpeg,png,gif}', '#src/images/**/*.{jpg,jpeg,png,gif}', '!#src/images/icons/iconsprite/*'],
+        fonts: '#src/fonts/**/*.ttf',
+        fontScss: '#src/scss/fonts.scss',
+        iconsprite: ['#src/images/icons/iconsprite/*.svg']
     },
     build: {
         html: 'dist/',
         css: 'dist/css/',
         js: 'dist/js/',
-        images: 'dist/images/'
+        images: 'dist/images/',
+        fonts: 'dist/fonts/',
+        icons: 'dist/images/icons/'
     },
     deletedFiles: {
         html: 'dist/*.html',
         css: 'dist/css/*.css',
         js: 'dist/js/*.js',
         libjs: ['dist/*.js', '!dist/js/script.js'],
-        images: 'dist/images/**/*.{jpg,jpeg,png,gif}'
+        images: 'dist/images/**/*.{jpg,jpeg,png,gif}',
+        fonts: 'dist/fonts/**/*.ttf'
     }
 }
 
@@ -63,7 +73,6 @@ async function html(cb) {
         }))
         .pipe(gulp.dest(paths.build.html))
         .pipe(browserSync.stream())
-
 }
 
 async function css(cb) {
@@ -139,6 +148,42 @@ async function images() {
         .pipe(gulp.dest(paths.build.images))
 }
 
+async function ttf(done) {
+    await del(paths.deletedFiles.fonts)
+
+    gulp.src(paths.src.fonts)
+        .pipe(ttf2woff())
+        .pipe(gulp.dest(paths.build.fonts))
+
+    gulp.src(paths.src.fonts)
+        .pipe(ttf2woff2())
+        .pipe(gulp.dest(paths.build.fonts))
+
+    done()
+}
+
+function fontStyle(done) {
+    fs.writeFile(paths.src.fontScss, '', () => {});
+    fs.readdir(paths.build.fonts, (err, items) => {
+        if (items) {
+            let c_fontname;
+            for (let i = 0; i < items.length; i++) {
+                let fontname = items[i].split('.'),
+                    fontExt;
+                fontExt = fontname[1];
+                fontname = fontname[0];
+                if (c_fontname !== fontname) {
+                    if (fontExt === 'woff' || fontExt === 'woff2') {
+                        fs.appendFile(paths.src.fontScss, `@include font-face("${fontname}", "${fontname}", 400);\r\n`, () => {});
+                    }
+                }
+                c_fontname = fontname;
+            }
+        }
+    })
+    done();
+}
+
 
 function server() {
     browserSync.init({
@@ -150,13 +195,35 @@ function server() {
     })
 }
 
+function svgSprite() {
+    return gulp.src(paths.src.iconsprite)
+        .pipe(cheerio({
+            run: function ($) {
+                $('[fill]').removeAttr('fill');
+                $('[stroke]').attr('stroke', 'currentColor');
+                // $('[style]').removeAttr('style');
+            },
+            parserOptions: {xmlMode: true}
+        }))
+        .pipe(sprite({
+            mode: {
+                stack: {
+                    sprite: "../icons.svg"
+                }
+            }
+        }))
+        .pipe(gulp.dest(paths.build.icons))
+}
+
 function watcher() {
     gulp.watch(paths.src.html, html)
     gulp.watch(paths.src.scss, css)
     gulp.watch(paths.src.js, js)
     gulp.watch(paths.src.libjs, libjs)
-    gulp.watch(paths.src.libjs, images)
+    gulp.watch(paths.src.images, images)
 }
 
 const dev = gulp.series(html, css, js, libjs, images, gulp.parallel(server, watcher))
+const fonts = gulp.series(ttf, fontStyle)
 export default dev
+export {fonts, svgSprite}
