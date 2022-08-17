@@ -1,0 +1,18 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: calc(19 / 14 * 100%);
+  min-height: 50px;
+  background-color: #000;
+  border-radius: 30px;
+  color: #fff;
+  padding: 2px 42px;
+  transition: all 0.3s ease 0s;
+  @media (any-hover: hover) {
+    &:hover {
+      background-color: #413378;
+    }
+  }
+}

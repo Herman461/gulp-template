@@ -1,22 +1,50 @@
+//==================================================================
+// Переменные для медиа запросов, контейнеров
+//==================================================================
 
-$md3: 767.98px;
+$minWidth: 320px;
+$maxWidth: 1920px;
+$maxWidthContainer: 1170;
+$md1: $maxWidthContainer;
+$md2: 991.98;
+$md3: 767.98;
+$md4: 575.98;
 
-@import "header";
-@import "mixins";
-@import "fonts";
-div {
-    display: flex;
-    > div {
-        span {
-            display: grid;
+//==================================================================
+// Типографика
+//==================================================================
+$mainColor: #000;
+
+//==================================================================
+// Стили для оболочек
+//==================================================================
+body {
+    color: $mainColor;
+    font-size: 14px;
+    font-family: 'Arial', sans-serif;
+    @media (max-width: $md3+px) {
+        &.lock {
+            overflow: hidden;
         }
     }
 }
 
-.class {
-    background: url("../images/Earth_Black_background_548690_4000x4000.jpg");
-    @media (max-width: $md3) {
-        display: block !important;
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
 
-    }
+.container {
+    max-width: $maxWidthContainer + px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+.header,
+.footer {
+    flex: 0 0 auto;
+}
+
+.page {
+    flex: 1 1 auto;
 }

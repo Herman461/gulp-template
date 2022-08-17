@@ -1,0 +1,26 @@
+.swiper-build {
+   overflow: hidden;
+   .swiper-wrapper {
+      display: flex;
+      height: 100%;
+      width: 100%;
+   }
+   .swiper-slide {
+      flex-shrink: 0;
+      height: 100%;
+      width: 100%;
+   }
+   &.swiper-container-multirow-column > .swiper-wrapper {
+      flex-direction: column;
+      justify-content: space-between;
+      flex-wrap: wrap;
+   }
+	&.swiper-container-autoheight .swiper-slide {
+		height: auto;
+	}
+	&.swiper-container-autoheight .swiper-wrapper {
+		align-items: flex-start;
+		transition-property: transform, height;
+	}
+}
+
